@@ -16,6 +16,24 @@ class UsersController < ApplicationController
     end
   end
 
+  def update
+    user = User.find(params[:id])
+    banner_img = params[:banner_picture]
+    profile_img = params[:profile_picture]
+    if user
+      if profile_img
+        profileFile = Cloudinary::Uploader.upload(profile_img)['url']
+        user.update(profile_picture: profileFile)
+      end
+      if banner_img
+        bannerFile = Cloudinary::Uploader.upload(banner_img)['url']
+        user.update(banner_picture: bannerFile)
+      end
+    end
+
+    render json: user
+  end
+
   def destroy
     user = User.find(params[:id])
     if user
@@ -40,11 +58,11 @@ class UsersController < ApplicationController
   def user_exists
     username = user_params[:username]
     user = User.find_by(username: username)
-    message = false;
+    jsonmessage = {message: false}
     if user
-      message = true
+      jsonmessage = {message: true, profile_picture: user.profile_picture}
     end
-    render json: {message: message}
+    render json: jsonmessage
   end
 
   def get_current_user
