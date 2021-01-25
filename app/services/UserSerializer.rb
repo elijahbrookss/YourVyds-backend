@@ -14,6 +14,14 @@ class UserSerializer
         },
         dislikes: {
           except: [:created_at, :updated_at]
+        },
+        saved_videos: {
+          except: [:created_at, :updated_at],
+          include: {
+            video: {
+              include: [:user, :likes]
+            }
+          }
         }
       },
     }

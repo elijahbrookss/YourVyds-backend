@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   resources :login, only: [:create]
   resources :likes, only: [:create, :destroy]
   resources :dislikes, only: [:create, :destroy]
+  resources :saved_videos, only: [:create, :destroy]
 
   post '/subscriptions_remove', to: "subscriptions#destroy"
   get '/subscription_info/:id', to: "users#get_subscriber_information_on_user"
