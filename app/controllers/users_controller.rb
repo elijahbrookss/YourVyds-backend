@@ -54,7 +54,12 @@ class UsersController < ApplicationController
 
   def get_subscriber_information_on_user
     user = User.find(params[:id])
-    render json: SubscriberSerializer.new(user).serialize
+    if user
+      render json: SubscriberSerializer.new(user).serialize
+    else
+      render json: {message: "Please log in."}
+
+    end
   end
 
   def user_exists
