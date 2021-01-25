@@ -22,11 +22,13 @@ class UsersController < ApplicationController
     profile_img = params[:profile_picture]
     if user
       if profile_img
-        profileFile = Cloudinary::Uploader.upload(profile_img)['url']
+        profileFile = Cloudinary::Uploader.upload(profile_img,
+           public_id: "pfp-" + user.id.to_s)['url']
         user.update(profile_picture: profileFile)
       end
       if banner_img
-        bannerFile = Cloudinary::Uploader.upload(banner_img)['url']
+        bannerFile = Cloudinary::Uploader.upload(banner_img,
+            public_id:"bfp-" + user.id.to_s)['url']
         user.update(banner_picture: bannerFile)
       end
     end

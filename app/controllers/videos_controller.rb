@@ -2,16 +2,20 @@ class VideosController < ApplicationController
   skip_before_action  :authorized, only: [:show, :index]
   def create
     video = Video.new()
-    imageFile = Cloudinary::Uploader.upload(params[:thumbnail])
-    videoFile = Cloudinary::Uploader.upload(params[:video], :resource_type => :video)
-
     video.name = params[:name]
     video.description = params[:description]
-    video.thumbnail = imageFile['url']
-    video.video = videoFile['url']
-
     video.user = current_user
     if video.save
+      imageFile = Cloudinary::Uploader.upload(params[:thumbnail],
+         public_id: "thb-" + video.id.to_s)
+      videoFile = Cloudinary::Uploader.upload(
+          params[:video],
+          resource_type: :video,
+          public_id: "vid-" + video.id.to_s
+      )
+      video.thumbnail = imageFile['url']
+      video.video = videoFile['url']
+      video.save
       render json: VideoSerializer.new(video).serialize
     end
   end
@@ -23,6 +27,11 @@ class VideosController < ApplicationController
 
   def destroy
     video = Video.find(params[:id])
+    Cloudinary::Uploader.destroy(
+      'vid-' + video.id.to_s,
+      resource_type: :video
+    )
+    Cloudinary::Uploader.destroy('thb-' + video.id.to_s)
     if video
       video.destroy
     end
@@ -38,15 +47,21 @@ class VideosController < ApplicationController
   def update
     video = Video.find(params[:id])
     if video
-      video.update(video_params)
+      video.name = params[:name]
+      video.description = params[:description]
+      imageFile = Cloudinary::Uploader.upload(params[:thumbnail],
+         public_id: "thb-" + video.id.to_s)
+      videoFile = Cloudinary::Uploader.upload(
+          params[:video],
+          resource_type: :video,
+          public_id: "vid-" + video.id.to_s
+      )
+      video.thumbnail = imageFile['url']
+      video.video = videoFile['url']
 
+      video.save
       render json: VideoSerializer.new(video).serialize
     end
   end
 
-  private
-
-  def video_params
-    params.require(:video).permit( :name, :video, :thumbnail, :description)
-  end
 end
