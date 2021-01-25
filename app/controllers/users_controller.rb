@@ -49,7 +49,11 @@ class UsersController < ApplicationController
   end
 
   def get_subscriber_information
-    render json: SubscriberSerializer.new(current_user).serialize
+    if current_user
+      render json: SubscriberSerializer.new(current_user).serialize
+    else
+      render json: {message: "Please log in."}
+    end
   end
 
   def get_subscriber_information_on_user
@@ -58,7 +62,6 @@ class UsersController < ApplicationController
       render json: SubscriberSerializer.new(user).serialize
     else
       render json: {message: "Please log in."}
-
     end
   end
 
