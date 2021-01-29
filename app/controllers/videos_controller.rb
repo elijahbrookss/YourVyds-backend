@@ -16,15 +16,15 @@ class VideosController < ApplicationController
           params[:video],
           resource_type: :video,
           public_id: "vid-" + video.id.to_s)
-
-        video.thumbnail = imageFile['url']
-        video.video = videoFile['url']
+        if imageFile && videoFile
+          video.thumbnail = imageFile['url']
+          video.video = videoFile['url']
+        end
       rescue => e
         video.destroy
         render json: { error: "There was an error uploading video." }
-
       end
-      
+
       if video.save
         render json: VideoSerializer.new(video).serialize
       end
