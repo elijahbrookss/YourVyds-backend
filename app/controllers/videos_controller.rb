@@ -6,17 +6,26 @@ class VideosController < ApplicationController
     video.description = params[:description]
     video.user = current_user
     if video.save
-      imageFile = Cloudinary::Uploader.upload(params[:thumbnail],
-         public_id: "thb-" + video.id.to_s)
-      videoFile = Cloudinary::Uploader.upload(
+
+      begin
+        imageFile = Cloudinary::Uploader.upload(
+          params[:thumbnail],
+          public_id: "thb-" + video.id.to_s)
+
+        videoFile = Cloudinary::Uploader.upload(
           params[:video],
           resource_type: :video,
-          public_id: "vid-" + video.id.to_s
-      )
-      video.thumbnail = imageFile['url']
-      video.video = videoFile['url']
-      video.save
-      render json: VideoSerializer.new(video).serialize
+          public_id: "vid-" + video.id.to_s)
+
+        video.thumbnail = imageFile['url']
+        video.video = videoFile['url']
+      rescue => e
+        video.destroy
+        render json: { error: "There was an error uploading video." }
+      end
+      if video.save
+        render json: VideoSerializer.new(video).serialize
+      end
     end
   end
 
@@ -41,6 +50,8 @@ class VideosController < ApplicationController
     video = Video.find(params[:id])
     if video
       render json: VideoSerializer.new(video).serialize
+    else
+      render json: {message: "Error..."}
     end
   end
 
@@ -49,18 +60,20 @@ class VideosController < ApplicationController
     if video
       video.name = params[:name]
       video.description = params[:description]
-      imageFile = Cloudinary::Uploader.upload(params[:thumbnail],
-         public_id: "thb-" + video.id.to_s)
+      imageFile = Cloudinary::Uploader.upload(
+        params[:thumbnail],
+        public_id: "thb-" + video.id.to_s)
       videoFile = Cloudinary::Uploader.upload(
-          params[:video],
-          resource_type: :video,
-          public_id: "vid-" + video.id.to_s
+        params[:video],
+        resource_type: :video,
+        public_id: "vid-" + video.id.to_s
       )
       video.thumbnail = imageFile['url']
       video.video = videoFile['url']
 
-      video.save
-      render json: VideoSerializer.new(video).serialize
+      if video.save
+        render json: VideoSerializer.new(video).serialize
+      end
     end
   end
 
