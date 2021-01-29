@@ -22,7 +22,9 @@ class VideosController < ApplicationController
       rescue => e
         video.destroy
         render json: { error: "There was an error uploading video." }
+
       end
+      
       if video.save
         render json: VideoSerializer.new(video).serialize
       end
