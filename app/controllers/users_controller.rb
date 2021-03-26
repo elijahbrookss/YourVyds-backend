@@ -12,7 +12,7 @@ class UsersController < ApplicationController
       token = encode_token(user_id: user.id)
       render json: { jwt: token }, status: :created
     else
-      render json: { error: "Failed to create account" }, status: :not_acceptable
+      render json: { error: "Failed to create account." }, status: :not_acceptable
     end
   end
 

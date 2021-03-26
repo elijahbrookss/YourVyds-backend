@@ -22,7 +22,7 @@ class VideosController < ApplicationController
         end
       rescue => e
         video.destroy
-        render json: { error: "There was an error uploading video." }
+        render json: { error: "Unfortunately, there was an error uploading this video." }
       end
 
       if video.save
